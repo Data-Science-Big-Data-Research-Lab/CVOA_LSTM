@@ -11,18 +11,12 @@ if __name__ == '__main__':
     data = data_to_supervised(data, historical_window=168, prediction_horizon=24)
     # Split the dataset
     xtrain, xtest, ytrain, ytest, xval, yval = splitData(data, historical_window=168, test_size=.3, val_size=.3)
-    # Add shape to use LSTM network1024
+    # Add shape to use LSTM network
     xtrain, xtest, ytrain, ytest, xval, yval = adaptShapesToLSTM(xtrain, xtest, ytrain, ytest, xval, yval)
 
     # Deep Learning parameters
     epochs = 10
     batch = 1024
-
-    # To be removed (only for testing)
-    #xtrain = xtrain[:300, ]
-    #ytrain = ytrain[:300, ]
-    #xval = xval[:50]
-    #yval = yval[:50]
     
     # Initialize problem
     cvoa = CVOA(size_fixed_part = 3, min_size_var_part = 2, max_size_var_part = 11, fixed_part_max_values = [5, 8], var_part_max_value = 11, max_time = 20,

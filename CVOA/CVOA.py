@@ -12,11 +12,11 @@ class CVOA:
     MIN_SPREAD = 0
     MAX_SPREAD = 5
     MIN_SUPERSPREAD = 6
-    MAX_SUPERSPREAD = 25 #15
+    MAX_SUPERSPREAD = 25
     P_TRAVEL = 0.1
     P_REINFECTION = 0.01
     SUPERSPREADER_PERC = 0.04
-    DEATH_PERC = 0.5 #0.04
+    DEATH_PERC = 0.5 
 
     def __init__(self, size_fixed_part, min_size_var_part, max_size_var_part, fixed_part_max_values, var_part_max_value, max_time, xtrain, ytrain, xval, yval, pred_horizon=24, epochs=10, batch=1024, scaler=None):
         self.infected = []
@@ -156,7 +156,5 @@ class CVOA:
                                          individual_variable_part=individual.var_part, scaler=self.scaler,
                                          prediction_horizon=self.pred_horizon, epochs=self.epochs, batch=self.batch)
         print(individual)
-        #print(model.summary())
-        #print("---\n"+"Loss: " + str(loss) + " MAPE: " + str(mape) + " MSE: " + str(mse) + "\n---")
         print("---\n" + "MSE: ", " {:.4f}".format(mse) + " ; MAPE: ", " {:.4f}".format(mape) + "\n---")
         return mape.numpy(), model

@@ -10,7 +10,6 @@ from tensorflow.keras.layers import Flatten
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
 
-# Begin Only for GPU
 config = ConfigProto()
 config.gpu_options.allow_growth = True
 session = InteractiveSession(config=config)
@@ -27,7 +26,6 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 #print(tf.config.list_physical_devices('GPU'))
 print(tf.test.is_built_with_cuda())
 
-# End Only for GPU
 
 hp_parser = {
     "learning_rate": {0:.0, 1:10e-1, 2:10e-2, 3:10e-3, 4:10e-4, 5:10e-5},
@@ -66,25 +64,19 @@ def fit_lstm_model(xtrain, ytrain, xval, yval, individual_fixed_part, individual
             model.add(LSTM(units=hp_parser["units"][individual_variable_part[i]], return_sequences=False))
         model.add(Dropout(dp))
     model.add(Dense(units=prediction_horizon, activation="tanh"))
-    #print(model.summary())
     model.compile(optimizer=keras.optimizers.Adam(learning_rate=hp_parser["learning_rate"][individual_fixed_part[0]]), loss="mean_squared_error", metrics=[keras.metrics.MAPE, keras.metrics.MSE])
     model.fit(x=xtrain, y=ytrain, epochs=epochs, batch_size=batch, verbose=0, validation_data=(xval, yval))
-    #score = model.evaluate(xval, yval, batch_size=batch, verbose=0)
-    #return score[0], score[1], score[2], model  # Loss, MAPE, MSE
     mse, mape = getMetrics_denormalized(model, xval, yval, batch, scaler)
-    return mse, mape, model  # mse denormalized, MAPE denormalized, model
+    return mse, mape, model 
 
 
 def getMetrics_denormalized(model, xval, yval, batch, scaler):
     predictions = model.predict(xval, batch_size=batch, verbose=0)
     pred = scaler.inverse_transform(predictions.reshape(1, -1)).flatten()
     real = scaler.inverse_transform(yval.reshape(1, -1)).flatten()
-    #print("MIN yval:", str(np.amin(real)))
-    #print("MAX yval:", str(np.amax(real)))
     return keras.metrics.MSE(real, pred), keras.metrics.mape(real, pred)
 
 def resetTF():
     ops.reset_default_graph()
     keras.backend.clear_session()
-    #del model # He leido que debería borrarse el modelo
 
